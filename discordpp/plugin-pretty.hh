@@ -2,7 +2,7 @@
 
 namespace discordpp{
 	template<class BASE>
-	class PluginTemplate: public BASE, virtual BotStruct{
+	class PluginPretty: public BASE, virtual BotStruct{
 	public:
 	};
 }

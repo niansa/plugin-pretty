@@ -190,6 +190,16 @@ namespace discordpp{
 				const std::string &message,
 				const std::function<void(const json)> &callback = [](const json &){}
 		){
+			std::ostringstream message_str;
+			message_str << "/channels/" << channel << "/messages";
+			sendMessage(channel, message_str.str(), callback);
+		}
+
+		virtual void sendMessage(
+				const std::string &channel,
+				const std::string &message,
+				const std::function<void(const json)> &callback = [](const json &){}
+		){
 			std::ostringstream target;
 			target << "/channels/" << channel << "/messages";
 			call(

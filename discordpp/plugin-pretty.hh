@@ -177,6 +177,30 @@ namespace discordpp{
 	template<class BASE>
 	class PluginPretty: public BASE, virtual BotStruct{
 	public:
+		virtual void sendMessage(
+				const snowflake &channel,
+				const std::string &message,
+				const std::function<void(json)> &callback = [](const json &){}
+		){
+			std::ostringstream target;
+			target << "/channels/" << channel << "/messages";
+			BASE::call("POST", target.str(), json({{"content", message}}));
+			call(
+					std::make_shared<std::string>("POST"),
+					std::make_shared<std::string>(target.str()),
+					std::make_shared<void(json)>(callback)
+			);
+		}
 
+		virtual void setStatus(
+				const Status &status,
+				const std::function<void()> &callback = [](){}
+		){
+			send(
+					3,
+					std::make_shared<json>(status),
+					std::make_shared<std::function<void()>>(callback)
+			);
+		}
 	};
 }

@@ -4,6 +4,7 @@ namespace discordpp{
 	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags
 	struct ActivityFlags{
 		bool active = true;
+
 		// TODO
 		json toJson(){
 			return json();
@@ -13,6 +14,7 @@ namespace discordpp{
 	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets
 	struct ActivitySecrets{
 		bool active = true;
+
 		// TODO
 		json toJson(){
 			return json();
@@ -23,6 +25,7 @@ namespace discordpp{
 	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets
 	struct ActivityAssets{
 		bool active = true;
+
 		// TODO
 		json toJson(){
 			return json();
@@ -32,6 +35,7 @@ namespace discordpp{
 	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-party
 	struct ActivityParty{
 		bool active = true;
+
 		// TODO
 		json toJson(){
 			return json();
@@ -41,6 +45,7 @@ namespace discordpp{
 	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
 	struct ActivityEmoji{
 		bool active = true;
+
 		// TODO
 		json toJson(){
 			return json();
@@ -50,6 +55,7 @@ namespace discordpp{
 	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps
 	struct ActivityTimestamps{
 		bool active = true;
+
 		// TODO
 		json toJson(){
 			return json();
@@ -74,7 +80,9 @@ namespace discordpp{
 		ActivityParty party;
 		ActivityAssets assets;
 		ActivitySecrets secrets;
-		enum instance {low, high, undefined}instance = undefined;
+		enum instance{
+			low, high, undefined
+		}instance = undefined;
 		ActivityFlags flags;
 
 		Activity(){

@@ -1,18 +1,143 @@
 #pragma once
 
 namespace discordpp{
-	// Presence Update
-	struct Activity{
+	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags
+	struct ActivityFlags{
 		bool active = true;
+		// TODO
 		json toJson(){
 			return json();
 		}
 	};
-	// Presence Update
+
+	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets
+	struct ActivitySecrets{
+		bool active = true;
+		// TODO
+		json toJson(){
+			return json();
+		}
+	};
+
+
+	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets
+	struct ActivityAssets{
+		bool active = true;
+		// TODO
+		json toJson(){
+			return json();
+		}
+	};
+
+	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-party
+	struct ActivityParty{
+		bool active = true;
+		// TODO
+		json toJson(){
+			return json();
+		}
+	};
+
+	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
+	struct ActivityEmoji{
+		bool active = true;
+		// TODO
+		json toJson(){
+			return json();
+		}
+	};
+
+	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps
+	struct ActivityTimestamps{
+		bool active = true;
+		// TODO
+		json toJson(){
+			return json();
+		}
+	};
+
+	// https://discord.com/developers/docs/topics/gateway#activity-object
+	struct Activity{
+		bool active = true;
+
+		std::string name;
+		enum type{
+			Game, Streaming, Listening, Custom
+		}type = Game;
+		std::string url;
+		std::time_t created_at = std::numeric_limits<std::time_t>::max();
+		ActivityTimestamps timestamps;
+		snowflake application_id = std::numeric_limits<snowflake>::max();
+		std::string details;
+		std::string state;
+		ActivityEmoji emoji;
+		ActivityParty party;
+		ActivityAssets assets;
+		ActivitySecrets secrets;
+		enum instance {low, high, undefined}instance = undefined;
+		ActivityFlags flags;
+
+		Activity(){
+			timestamps.active = false;
+			emoji.active = false;
+			party.active = false;
+			assets.active = false;
+			secrets.active = false;
+			flags.active = false;
+		}
+
+		json toJson(){
+			json out{
+					{"name", name},
+					{"type", type}
+			};
+			if(!url.empty()){
+				out["url"] = url;
+			}
+			if(created_at != std::numeric_limits<std::time_t>::max()){
+				out["created_at"] = (int)created_at;
+			}
+			if(timestamps.active){
+				out["timestamps"] = timestamps.toJson();
+			}
+			if(application_id != std::numeric_limits<snowflake>::max()){
+				out["application_id"] = application_id;
+			}
+			if(!details.empty()){
+				out["details"] = details;
+			}
+			if(!state.empty()){
+				out["state"] = state;
+			}
+			if(emoji.active){
+				out["emoji"] = emoji.toJson();
+			}
+			if(party.active){
+				out["party"] = party.toJson();
+			}
+			if(assets.active){
+				out["assets"] = assets.toJson();
+			}
+			if(secrets.active){
+				out["secrets"] = secrets.toJson();
+			}
+			if(instance != undefined){
+				out["instance"] = (bool)instance;
+			}
+			if(flags.active){
+				out["flags"] = flags.toJson();
+			}
+			return out;
+		}
+	};
+
+	// https://discord.com/developers/docs/topics/gateway#update-status
 	struct Status{
 		int since = -1;
 		Activity game;
-		enum status {online, dnd, idle, invisible, offline}status = online;
+		enum status{
+			online, dnd, idle, invisible, offline
+		}status = online;
 		bool afk = false;
 
 		Status(){

@@ -6,7 +6,7 @@ namespace discordpp{
 		bool active = true;
 
 		// TODO
-		json toJson(){
+		json toJson() const{
 			return json();
 		}
 	};
@@ -16,7 +16,7 @@ namespace discordpp{
 		bool active = true;
 
 		// TODO
-		json toJson(){
+		json toJson() const{
 			return json();
 		}
 	};
@@ -27,7 +27,7 @@ namespace discordpp{
 		bool active = true;
 
 		// TODO
-		json toJson(){
+		json toJson() const{
 			return json();
 		}
 	};
@@ -37,7 +37,7 @@ namespace discordpp{
 		bool active = true;
 
 		// TODO
-		json toJson(){
+		json toJson() const{
 			return json();
 		}
 	};
@@ -47,7 +47,7 @@ namespace discordpp{
 		bool active = true;
 
 		// TODO
-		json toJson(){
+		json toJson() const{
 			return json();
 		}
 	};
@@ -57,7 +57,7 @@ namespace discordpp{
 		bool active = true;
 
 		// TODO
-		json toJson(){
+		json toJson() const{
 			return json();
 		}
 	};
@@ -94,7 +94,7 @@ namespace discordpp{
 			flags.active = false;
 		}
 
-		json toJson(){
+		json toJson() const{
 			json out{
 					{"name", name},
 					{"type", type}
@@ -152,7 +152,7 @@ namespace discordpp{
 			game.active = false;
 		}
 
-		json toJson(){
+		json toJson() const{
 			json out;
 			if(since >= 0){
 				out["since"] = since;
@@ -188,15 +188,15 @@ namespace discordpp{
 		virtual void sendMessage(
 				const snowflake &channel,
 				const std::string &message,
-				const std::function<void(json)> &callback = [](const json &){}
+				const std::function<void(const json)> &callback = [](const json &){}
 		){
 			std::ostringstream target;
 			target << "/channels/" << channel << "/messages";
-			BASE::call("POST", target.str(), json({{"content", message}}));
 			call(
 					std::make_shared<std::string>("POST"),
 					std::make_shared<std::string>(target.str()),
-					std::make_shared<void(json)>(callback)
+					std::make_shared<json>(json({{"content", message}})),
+					std::make_shared<std::function<void(const json)>>(callback)
 			);
 		}
 
@@ -206,7 +206,7 @@ namespace discordpp{
 		){
 			send(
 					3,
-					std::make_shared<json>(status),
+					std::make_shared<json>(status.toJson()),
 					std::make_shared<std::function<void()>>(callback)
 			);
 		}

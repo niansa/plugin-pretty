@@ -1,77 +1,178 @@
 #pragma once
 
 namespace discordpp{
-	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags
-	struct ActivityFlags{
-		bool active = true;
+    struct apiStruct {
+        virtual bool isValid() const = 0;
+        virtual json toJson() const = 0;
+    };
 
-		// TODO
+    // https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags
+    struct ActivityFlags: public apiStruct {
+        bool instance = false;
+        bool join = false;
+        bool spectate = false;
+        bool joinRequest = false;
+        bool sync = false;
+        bool play = false;
+
+        int getflags() const{
+            // Create integer bitwise
+            int out = 0;
+            //INSTANCE
+            out += instance;
+            out <<= 1;
+            //JOIN
+            out += join;
+            out <<= 1;
+            //SPECTATE
+            out += spectate;
+            out <<= 1;
+            //JOIN_REQUEST
+            out += joinRequest;
+            out <<= 1;
+            //SYNC
+            out += sync;
+            out <<= 1;
+            //PLAY
+            out += play;
+            out <<= 1;
+            // Return the resulting integer
+            return out;
+        }
+        bool isValid() const{
+            return getflags();
+        }
+        json toJson() const{
+            return json(getflags());
+        }
+    };
+
+    // https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets
+    struct ActivitySecrets: public apiStruct {
+        std::string join; // Optional
+        std::string spectate; // Optional
+        std::string match; // Optional
+
+        bool isValid() const{
+            return !join.empty() || !spectate.empty() || !match.empty();
+        }
 		json toJson() const{
-			return json();
+            json out;
+            if (join.empty()) {
+                out["join"] = join;
+            }
+            if (spectate.empty()) {
+                out["spectate"] = spectate;
+            }
+            if (match.empty()) {
+                out["match"] = match;
+            }
+            return out;
 		}
 	};
 
-	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets
-	struct ActivitySecrets{
-		bool active = true;
+    // https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets
+    struct ActivityAssets: public apiStruct {
+        snowflake large_image = 0; // Optional
+        std::string large_text; // Optional
+        snowflake small_image = 0; // Optional
+        std::string small_text; // Optional
 
-		// TODO
+        bool isValid() const{
+            return large_image != 0 || !large_text.empty()
+                    || small_image != 0 || !small_text.empty();
+        }
 		json toJson() const{
-			return json();
+            json out;
+            if (large_image != 0) {
+                out["large_image"] = large_image;
+            }
+            if (small_image != 0) {
+                out["small_image"] = small_image;
+            }
+            if (!large_text.empty()) {
+                out["large_text"] = large_text;
+            }
+            if (!small_text.empty()) {
+                out["small_text"] = small_text;
+            }
+            return out;
 		}
 	};
 
+    // https://discord.com/developers/docs/topics/gateway#activity-object-activity-party
+    struct ActivityParty: public apiStruct {
+        snowflake id = 0; // Optional
+        int current_size = 0, max_size = 0; // Optional
 
-	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets
-	struct ActivityAssets{
-		bool active = true;
-
-		// TODO
+        bool isValid() const{
+            return id != 0 ||
+                    (current_size != 0 && max_size != 0);
+        }
 		json toJson() const{
-			return json();
+            json out;
+            if (id != 0) {
+                out["id"] = id;
+            }
+            if (current_size != 0 && max_size != 0) {
+                out["size"] = json({current_size, max_size});
+            }
+            return out;
 		}
 	};
 
-	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-party
-	struct ActivityParty{
-		bool active = true;
+    // https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
+    struct ActivityEmoji{
+        std::string name;
+        snowflake id = 0; // Optional
+        bool animated = false; // Optional
 
-		// TODO
+        bool isValid() const{
+            return !name.empty();
+        }
 		json toJson() const{
-			return json();
+            json out;
+            out["name"] = name;
+            out["animated"] = animated;
+            if (id != 0){
+                out["id"] = id;
+            }
+            return out;
 		}
 	};
 
-	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
-	struct ActivityEmoji{
-		bool active = true;
+    // https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps
+    struct ActivityTimestamps: public apiStruct {
+        int start = 0; // Optional
+        int end = 0; // Optional
 
-		// TODO
-		json toJson() const{
-			return json();
+        bool isValid() const{
+            return start != 0 || end != 0;
+        }
+        json toJson() const{
+            json out;
+            if (start != 0){
+                out["start"] = start;
+            }
+            if (end != 0){
+                out["end"] = end;
+            }
+            return out;
 		}
 	};
 
-	// https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps
-	struct ActivityTimestamps{
-		bool active = true;
+    // https://discord.com/developers/docs/topics/gateway#activity-object
+    struct Activity: public apiStruct {
+        bool isValid() const{
+            return true;
+        }
 
-		// TODO
-		json toJson() const{
-			return json();
-		}
-	};
-
-	// https://discord.com/developers/docs/topics/gateway#activity-object
-	struct Activity{
-		bool active = true;
-
-		std::string name;
+        std::string name;
 		enum type{
 			Game, Streaming, Listening, Custom
 		}type = Game;
 		std::string url;
-		std::time_t created_at = std::numeric_limits<std::time_t>::max();
+        int created_at = 0;
 		ActivityTimestamps timestamps;
 		snowflake application_id = std::numeric_limits<snowflake>::max();
 		std::string details;
@@ -85,79 +186,65 @@ namespace discordpp{
 		}instance = undefined;
 		ActivityFlags flags;
 
-		Activity(){
-			timestamps.active = false;
-			emoji.active = false;
-			party.active = false;
-			assets.active = false;
-			secrets.active = false;
-			flags.active = false;
-		}
-
 		json toJson() const{
 			json out{
 					{"name", name},
 					{"type", type}
 			};
-			if(!url.empty()){
+            if(!url.empty()){
 				out["url"] = url;
 			}
-			if(created_at != std::numeric_limits<std::time_t>::max()){
-				out["created_at"] = (int)created_at;
+            if(created_at != 0){
+                out["created_at"] = created_at;
 			}
-			if(timestamps.active){
+            if(timestamps.isValid()){
 				out["timestamps"] = timestamps.toJson();
 			}
-			if(application_id != std::numeric_limits<snowflake>::max()){
+            if(application_id != std::numeric_limits<snowflake>::max()){
 				out["application_id"] = application_id;
 			}
-			if(!details.empty()){
+            if(!details.empty()){
 				out["details"] = details;
 			}
-			if(!state.empty()){
+            if(!state.empty()){
 				out["state"] = state;
 			}
-			if(emoji.active){
+            if(emoji.isValid()){
 				out["emoji"] = emoji.toJson();
 			}
-			if(party.active){
+            if(party.isValid()){
 				out["party"] = party.toJson();
 			}
-			if(assets.active){
+            if(assets.isValid()){
 				out["assets"] = assets.toJson();
 			}
-			if(secrets.active){
+            if(secrets.isValid()){
 				out["secrets"] = secrets.toJson();
 			}
 			if(instance != undefined){
 				out["instance"] = (bool)instance;
 			}
-			if(flags.active){
+            if(flags.isValid()){
 				out["flags"] = flags.toJson();
-			}
+            }
+            std::clog << out << std::endl;
 			return out;
 		}
 	};
 
-	// https://discord.com/developers/docs/topics/gateway#update-status
+    // https://discord.com/developers/docs/topics/gateway#update-status
 	struct Status{
-		int since = -1;
+        time_t since = 0;
 		Activity game;
 		enum status{
 			online, dnd, idle, invisible, offline
 		}status = online;
 		bool afk = false;
 
-		Status(){
-			game.active = false;
-		}
-
 		json toJson() const{
 			json out;
-			if(since >= 0){
-				out["since"] = since;
-			}
-			if(game.active){
+            out["since"] = since;
+            if(game.isValid()){
 				out["game"] = game.toJson();
 			}
 			switch(status){
@@ -178,13 +265,21 @@ namespace discordpp{
 					break;
 			}
 			out["afk"] = afk;
-			return out;
+            return out;
 		}
 	};
 
 	template<class BASE>
 	class PluginPretty: public BASE, virtual BotStruct{
-	public:
+    public:
+        virtual void sendMessage(
+                const json &channel,
+                const std::string &message,
+                const std::function<void(const json)> &callback = [](const json &){}
+        ){
+            sendMessage(channel.get<std::string>(), message, callback);
+        }
+
 		virtual void sendMessage(
 				const snowflake &channel,
 				const std::string &message,
@@ -203,10 +298,10 @@ namespace discordpp{
 			std::ostringstream target;
 			target << "/channels/" << channel << "/messages";
 			call(
-					std::make_shared<std::string>("POST"),
-					std::make_shared<std::string>(target.str()),
-					std::make_shared<json>(json({{"content", message}})),
-					std::make_shared<std::function<void(const json)>>(callback)
+                    std::make_shared<std::string>("POST"),
+                    std::make_shared<std::string>(target.str()),
+                    std::make_shared<json>(json({{"content", message}})),
+                    std::make_shared<std::function<void(const json)>>(callback)
 			);
 		}
 

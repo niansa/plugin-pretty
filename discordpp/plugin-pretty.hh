@@ -369,7 +369,7 @@ namespace discordpp{
             return true;
         }
 
-        std::string name;
+        std::string name = "undefined";
         enum type{
             Game, Streaming, Listening, Custom
         }type = Game;
